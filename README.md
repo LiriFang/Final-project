@@ -7,13 +7,18 @@ DELETE the lines from TEMPLATE up.
 TEMPLATE for your report:
 
 # Title: 
+Simulation of Parking around iSchool
 
 ## Team Member(s):
 Liri Fang, Jiawei Li, Jing Du
 
 # Monte Carlo Simulation Scenario & Purpose:
 
+In this project, we will designe a program to simulate the daily parking senario of iSchool students. Since the parking place on campus has limited number, especially near the School of Information Science Building. Sometimes it is hard for students to find a available place to park near the school. This project tries to using Monte Carlo simulation method to make a prediction about the probability of whether a ischool student successfully find a parking place at a particular time. Referencing this probability, the student can decide wether drive car to the school or park the car at somewhere else rather than near the school building.
+
 ### Hypothesis before running the simulation:
+
+
 
 ### Simulation's variables of uncertainty
 List and describe your simulation's variables of uncertainty (where you're using pseudo-random number generation). 
