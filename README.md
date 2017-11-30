@@ -13,11 +13,23 @@ In this project, we will design a program to simulate the daily parking senario 
 
 1. This project only consider the meters near to the iSchool including the places on the streets and in the parking lots. We define "near" as within a block distance from iSchool. Therefore, in this project, only the parking lots on Fifth St, Sixth St, Daniel St, Chalmers St and the parking lots within the rectangle are considered.
 The numebr of meters near the School of Information Science Building is: 90. The distribution of all the meters as as follows:
-Street Name     Number of Parking Lots     Maximum Stay     Owner
-E Daniel St     23                         2h               City of Champaign
+
+
+Street Name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Number of Parking Lots&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Maximum Stay&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Owner
+
+
+E Daniel St&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;23&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2h&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;City of Champaign
+
+
 S 6th St        30                         2h               City of Champaign
+
+
 E Chalmers St   23                         4h               City of Champaign
+
+
 S 5th St        10                         2h               City of Champaign
+
+
 N/A             4                          10h              UIUC
 
 2. To simplify the simulation model, we assume that meters nearing iSchool are all used by iSchool students. We suppose that most students drive to school for classes. Therefore, we assume the number of cars come to parking has a positive correlation with the class time. Since at weekends and holidays, usually there is no class, and most of the parking lots are free of charge, we suppose that there are enough available parking all day. So, we will only simulate the weekday's parking senario as this is much more meaningful.
