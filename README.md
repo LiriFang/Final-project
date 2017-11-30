@@ -15,10 +15,10 @@ In this project, we will design a program to simulate the daily parking senario 
 The numebr of meters near the School of Information Science Building is: 90. The distribution of all the meters as as follows:
 
 
-Street Name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Number of Parking Lots&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Maximum Stay&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Owner
+Street Name&nbsp;&nbsp;Number of Parking Lots&nbsp;&nbsp;Maximum Stay&nbsp;&nbsp;Owner
 
 
-E Daniel St&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;23&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2h&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;City of Champaign
+E Daniel St &nbsp;&nbsp; 23 &nbsp;&nbsp; 2h &nbsp;&nbsp; City of Champaign
 
 
 S 6th St        30                         2h               City of Champaign
