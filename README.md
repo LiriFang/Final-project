@@ -1,10 +1,3 @@
-Create a FORK of this repository to store your code, data, and documentation for the final project. Detailed instructions for this assignment are in the course Moodle site.  The reason I'm asking you to fork this empty repository instead of creating a stand-alone repository is that it will be much easier for me and all students in the course to find all of our projects for code review and for grading. You can even get code review from students in the other section of IS590PR this way.
-
-Even though your fork of this repository shall remain public, you'll still need to explicitly add any students on your team as Collaborators in the Settings. That way you can grant them write privileges.
-
-DELETE the lines from TEMPLATE up.
-
-TEMPLATE for your report:
 
 # Title: 
 Simulation of Parking around iSchool
@@ -14,14 +7,16 @@ Liri Fang, Jiawei Li, Jing Du
 
 # Monte Carlo Simulation Scenario & Purpose:
 
-In this project, we will designe a program to simulate the daily parking senario of iSchool students. Since the parking place on campus has limited number, especially near the School of Information Science Building. Sometimes it is hard for students to find a available place to park near the school. This project tries to using Monte Carlo simulation method to make a prediction about the probability of whether a ischool student successfully find a parking place at a particular time. Referencing this probability, the student can decide wether drive car to the school or park the car at somewhere else rather than near the school building.
+In this project, we will design a program to simulate the daily parking senario of iSchool students. Since the parking place on campus has limited number, especially within the walking distance from the School of Information Sciences Building. Sometimes it is difficult for students to find an available place to park near the school. This project tries to using Monte Carlo simulation method to make a prediction about the probability of whether an iSchool student successfully find a vacant parking lot at a particular time. Referencing this probability, the student can decide wether drive car to the school or park the car at somewhere else rather than near the school building.
 
 ### Hypothesis before running the simulation:
 
-This project only consider the meters near to the iSchool including the places on the streets and in the parking lots. 
+1. This project only consider the meters near to the iSchool including the places on the streets and in the parking lots. We define "near" as within a block distance from iSchool. Therefore, in this project, only the parking lots on Fifth St, Sixth St, Daniel St, Chalmers St and the parking lots within the rectangle are considered.
 The numebr of meters near the School of Information Science Building is: xxx, they are seperated on the xxxxx
-To simplify the simulation model, we assume that meters nearing iSchool are all used by iSchool students. We suppose that most students drive to school for classes. Therefore, we assume the number of cars come to parking has a positive correlation with the class time. 
-Additionaly, we idealize the time that driver consumes on the finding parking place and pull over. In the simulation system, all time spend on driving will be treated as 0.
+
+2. To simplify the simulation model, we assume that meters nearing iSchool are all used by iSchool students. We suppose that most students drive to school for classes. Therefore, we assume the number of cars come to parking has a positive correlation with the class time. Since at weekends and holidays, usually there is no class, and most of the parking lots are free of charge, we suppose that there are enough available parking all day. So, we will only simulate the weekday's parking senario as this is much more meaningful.
+
+3. Additionaly, we idealize the time that driver consumes on the finding parking place and pull over. In the simulation system, all time spend on driving will be treated as 0.
 
 ### Simulation's variables of uncertainty
 
