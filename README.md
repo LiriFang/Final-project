@@ -56,8 +56,8 @@ User only needs to run the program and enter the time and day he/she will arrive
 
 ## Sources Used:
 https://en.wikipedia.org/wiki/Monte_Carlo_method
-http://www.parking.illinois.edu
-https://pypi.python.org/pypi/pandas-montecarlo
-https://github.com/chaimpollak/parking
+<br>http://www.parking.illinois.edu
+<br>https://pypi.python.org/pypi/pandas-montecarlo
+<br>https://github.com/chaimpollak/parking
 
 
