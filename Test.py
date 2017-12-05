@@ -1,8 +1,22 @@
 import numpy as np
 
 # Module-level Variable
+
+# unit checking time for the system
 UNIT_TIME = 5
-PARKINGLOT = np.array([10, 20, 0, 0])
+# Each array represents a street. The length of array represents the number of meters on that street, and the item in the array represents the time that the car will stoped.
+DANIELSTREET = np.zeros(23)
+SIXTHSTREET = np.zeros(30)
+CHALMERSSTREET = np.zeros(23)
+FIFTHSTREET = np.zeros(10)
+STREET = np.zeros(4)
+# whole parking lots around iSchool
+PARKINGLOTSMAPPING = {0:'DANIELSTREET', 1: 'SIXTHSTREET', 2: 'CHALMERSSTREET', 3: 'FIFTHSTREET', 4: 'STREET'}
+PARKINGLOTS = np.array([DANIELSTREET, SIXTHSTREET, CHALMERSSTREET, FIFTHSTREET, STREET])
+DANIELSTREET_T = np.array([5, 10, 4])
+SIXTHSTREET_T = np.array([0, 0, 30])
+PARKINGLOTS_TEST = np.array([DANIELSTREET_T, SIXTHSTREET_T])
+
 
 class RandomDurationTimeGenerator():
     pass
@@ -15,20 +29,23 @@ class ParkingLot():
     def FindParkingMeter(self, parking_status: np.array):
         '''
         This function is used to find which place is empty
-        :param parking_status: status of current parking lot
-        :return: index of empty place
+        :param parking_status: status of current parking lots
+        :return: index of available street(index) and the empty place on that street(index). None means no empty parking place.
 
-        >>> ParkingLot.FindParkingMeter(ParkingLot, PARKINGLOT)
-        2
+        >>> ParkingLot.FindParkingMeter(ParkingLot, PARKINGLOTS_TEST)
+        [1, 0]
         '''
 
         status = ParkingSystem.CheckParkingStatus(ParkingSystem, parking_status)
-        if status[1] == 0:
+        # find out which street is available for parking
+        availabel_street = np.nonzero(status[0])[0][0]
+
+        if availabel_street == None:
             return None
         else:
-            locations = np.where(parking_status == 0)
-            location = locations[0][0]
-        return location
+            # get the first empty parking place on that street
+            empty_place = np.where(parking_status[availabel_street] == 0)[0][0]
+            return [availabel_street, empty_place]
 
 class ParkingSystem():
 
@@ -38,12 +55,14 @@ class ParkingSystem():
         :param parking_status: status of current parking lot
         :return: parking stutus
 
-        >>> ParkingSystem.UnitTimeCheck(ParkingSystem, PARKINGLOT)
-        array([ 5, 15,  0,  0])
+        >>> ParkingSystem.UnitTimeCheck(ParkingSystem, PARKINGLOTS_TEST)
+        array([[ 0,  5,  0],
+               [ 0,  0, 25]])
         '''
         parking_status = parking_status - UNIT_TIME
-        error = parking_status < 0
-        parking_status[error] = 0
+        for street in parking_status:
+            error = street < 0
+            street[error] = 0
 
         return parking_status
 
@@ -53,17 +72,18 @@ class ParkingSystem():
         :param location: the location to park the car
         :param parking_status: status of current parking lot
         :param duration_time: parking duration time of the car in minutes
-        :return: parking status
+        :return: parking status. None meas no empty parking place.
 
-        >>> ParkingSystem.Parking(ParkingSystem, PARKINGLOT, 90)
-        array([10, 20, 90,  0])
+        >>> ParkingSystem.Parking(ParkingSystem, PARKINGLOTS_TEST, 90)
+        array([[ 5, 10,  4],
+               [90,  0, 30]])
         '''
 
         location = ParkingLot.FindParkingMeter(ParkingLot, parking_status)
         if location == None:
             return None
         else:
-            parking_status[location] = duration_time
+            parking_status[location[0]][location[1]] = duration_time
 
         return parking_status
 
@@ -72,17 +92,21 @@ class ParkingSystem():
         '''
         This function is used to calculate number of empty place and occupied place
         :param parking_status: status of current parking lot
-        :return: number of empty place and occupied place
+        :return: number of empty place and occupied place for each parking lot
 
-        >>> ParkingSystem.CheckParkingStatus(ParkingSystem, PARKINGLOT)
-        (2, 2)
+        >>> ParkingSystem.CheckParkingStatus(ParkingSystem, PARKINGLOTS_TEST)
+        ([0, 2], [3, 1])
         '''
+        empties = []
+        occupies = []
+        for street in parking_status:
+            empty = np.where(street == 0)
+            empty_num = len(empty[0])
+            empties.append(empty_num)
+            occupy_num = len(street) - empty_num
+            occupies.append(occupy_num)
 
-        empties = np.where(parking_status == 0)
-        empty_num = len(empties[0])
-        occupy_num = len(parking_status) - empty_num
-
-        return (occupy_num, empty_num)
+        return (empties, occupies)
 
 
     def CalculateParkingProbability(self, parking_status: np.array):
@@ -91,10 +115,18 @@ class ParkingSystem():
         :param parking_status:
         :return: parking probability
 
-        >>> ParkingSystem.CalculateParkingProbability(ParkingSystem, PARKINGLOT)
-        'Current occupied number: 2. Current empty number:2. Parking Probability: 0.5'
+        >>> print(ParkingSystem.CalculateParkingProbability(ParkingSystem, PARKINGLOTS_TEST))
+        Empty parking places on each street:
+        DANIELSTREET: 0
+        SIXTHSTREET: 2
+        <BLANKLINE>
         '''
         status = self.CheckParkingStatus(self, parking_status)
-        probability = status[1] / len(parking_status)
-        user_string = "Current occupied number: " + str(status[0]) + ". Current empty number:" + str(status[1]) + ". Parking Probability: " + str(probability)
+        empties = status[0]
+        occupies = status[1]
+        user_string = 'Empty parking places on each street:\n'
+        for i in range(len(empties)):
+            user_string = user_string + PARKINGLOTSMAPPING[i] + ': ' + str(empties[i]) + '\n'
         return(user_string)
+
+print(ParkingSystem.CalculateParkingProbability(ParkingSystem, PARKINGLOTS_TEST))
