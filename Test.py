@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 
 # Module-level Variable
 
@@ -106,6 +107,12 @@ class ParkingSystem():
             occupy_num = len(street) - empty_num
             occupies.append(occupy_num)
 
+        # write the empty records into a csv file
+        with open('EmptyRecords.csv', 'a') as er:
+            for i in range(len(empties) - 1):
+                er.write(str(empties[i]) + ',' )
+            er.write(str(empties[-1]) + '\n')
+
         return (empties, occupies)
 
 
@@ -114,19 +121,27 @@ class ParkingSystem():
         This function is used to calculate probability
         :param parking_status:
         :return: parking probability
-
-        >>> print(ParkingSystem.CalculateParkingProbability(ParkingSystem, PARKINGLOTS_TEST))
-        Empty parking places on each street:
-        DANIELSTREET: 0
-        SIXTHSTREET: 2
-        <BLANKLINE>
         '''
         status = self.CheckParkingStatus(self, parking_status)
         empties = status[0]
         occupies = status[1]
-        user_string = 'Empty parking places on each street:\n'
+        # user_string = 'Empty parking places on each street:\n'
+        # for i in range(len(empties)):
+        #     user_string = user_string + PARKINGLOTSMAPPING[i] + ': ' + str(empties[i]) + '\n'
+        # return (user_string)
+
+        # get number of empty places on each street
+        empty_records = pd.DataFrame.from_csv('EmptyRecords.csv', sep = ',', index_col = None)
+        empties = empty_records.astype(bool).sum(axis=0)
+        user_string = 'The probability of each street to find an empty parking place:\n'
         for i in range(len(empties)):
-            user_string = user_string + PARKINGLOTSMAPPING[i] + ': ' + str(empties[i]) + '\n'
+            probability = '{:.2f}%'.format(empties[i] / len(empty_records) * 100)
+            user_string = user_string + 'PARKINGLOTSMAPPING[i]' + ':' + str(probability) + '\n'
+
         return(user_string)
 
-print(ParkingSystem.CalculateParkingProbability(ParkingSystem, PARKINGLOTS_TEST))
+
+
+
+
+ParkingSystem.CalculateParkingProbability(ParkingSystem, PARKINGLOTS_TEST)
