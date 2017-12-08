@@ -1,7 +1,8 @@
 import numpy as np
 import pandas as pd
-
+from datetime import datetime
 # Module-level Variable
+from scipy.stats import norm
 
 # unit checking time for the system
 UNIT_TIME = 5
@@ -14,7 +15,7 @@ STREET = np.zeros(4)
 # whole parking lots around iSchool
 PARKINGLOTSMAPPING = {0:'DANIELSTREET', 1: 'SIXTHSTREET', 2: 'CHALMERSSTREET', 3: 'FIFTHSTREET', 4: 'STREET'}
 PARKINGLOTS = np.array([DANIELSTREET, SIXTHSTREET, CHALMERSSTREET, FIFTHSTREET, STREET])
-DANIELSTREET_T = np.array([5, 10, 4])
+DANIELSTREET_T = np.array([5, 1, 4])
 SIXTHSTREET_T = np.array([0, 0, 30])
 PARKINGLOTS_TEST = np.array([DANIELSTREET_T, SIXTHSTREET_T])
 
@@ -23,7 +24,75 @@ class RandomDurationTimeGenerator():
     pass
 
 class RandomCarInGenerator():
-    pass
+    def __init__(self, hour:int, minute:int):
+        self.hour = hour
+        self.minute = minute
+        File = 'course.csv'
+
+    def PersonRegistered(self, dataFile):
+        number = pd.read_csv(dataFile, index_col='hour')
+        return number
+
+    def PersonIn(self):
+        """
+        :return: (distribution)number of person attending in the class
+        """
+        person_uniform = np.random.uniform(0.5, 0.9)
+        #person_attended = number * person_uniform
+        return person_uniform
+
+    def CarInPercent(self):
+        """
+        :return: percentage of person who drive car and stop the car in the parking area
+        """
+        car_uniform = np.random.uniform(0.3, 0.5)
+        #car_num = car_uniform * person_attended
+        return car_uniform
+
+
+
+    def CarInDist(self, unit_time=1):
+        """
+        :param time: checking time
+        :return: car in distribution around starting time of class
+        >>> RandomCarInGenerator.CarInDist(RandomCarInGenerator)
+        """
+        minute = self.minute
+        hour = self.hour
+
+        if minute >= 50:
+            Y = (minute-50)/unit_time
+        elif minute < 50:
+            Y = minute/unit_time + 10/unit_time
+        X = minute/unit_time
+         #former
+
+        number = self.PersonRegistered(dataFile='course.csv')
+        person_uniform = self.PersonIn()
+        car_uniform = self.CarInPercent()
+        car_num_hour = number * person_uniform * car_uniform
+
+        car_dist_curr = norm.pdf(X, loc=50/unit_time, scale=30/unit_time)
+        car_curr = car_dist_curr * car_num_hour.iloc[hour]
+        car_dist_fmr = norm.pdf(Y, loc=50/unit_time, scale=30/unit_time)
+
+
+        car_fmr = car_dist_fmr * car_num_hour.iloc[hour + 1]
+        print (car_num_hour.iloc[hour], car_num_hour.iloc[hour+1])
+        car_num_unit_time = car_curr + car_fmr
+        return car_num_unit_time
+
+
+    def CarInError(self, time: datetime):
+        """
+        :param time: checking time
+        :return: Error number of Car (skewed_distribution)
+        """
+        pass
+
+car = RandomCarInGenerator(9, 50)
+print(car.CarInDist())
+
 
 class ParkingLot():
 
@@ -64,7 +133,6 @@ class ParkingSystem():
         for street in parking_status:
             error = street < 0
             street[error] = 0
-
         return parking_status
 
     def Parking(self, parking_status: np.array, duration_time: int):
@@ -144,4 +212,5 @@ class ParkingSystem():
 
 
 
-ParkingSystem.CalculateParkingProbability(ParkingSystem, PARKINGLOTS_TEST)
+print(ParkingSystem.CalculateParkingProbability(ParkingSystem, PARKINGLOTS_TEST))
+ParkingSystem.UnitTimeCheck(ParkingSystem, PARKINGLOTS_TEST)
