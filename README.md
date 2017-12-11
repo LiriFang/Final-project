@@ -59,5 +59,6 @@ https://en.wikipedia.org/wiki/Monte_Carlo_method
 <br>http://www.parking.illinois.edu
 <br>https://pypi.python.org/pypi/pandas-montecarlo
 <br>https://github.com/chaimpollak/parking
+<br>http://www.greatsolutions.com.br/images/BetaEng.pdf
 
 
