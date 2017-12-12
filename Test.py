@@ -49,6 +49,9 @@ class RandomCarInGenerator():
         #car_num = car_uniform * person_attended
         return car_uniform
 
+    @staticmethod
+    def BionomialDist(n, p):
+        np.random.binomial(n, p)
 
 
     def CarInDist(self, unit_time=1):
@@ -57,29 +60,27 @@ class RandomCarInGenerator():
         :return: car in distribution around starting time of class
         >>> RandomCarInGenerator.CarInDist(RandomCarInGenerator)
         """
-        minute = self.minute
-        hour = self.hour
-
-        if minute >= 50:
-            Y = (minute-50)/unit_time
-        elif minute < 50:
-            Y = minute/unit_time + 10/unit_time
-        X = minute/unit_time
-         #former
-
+        car_num_unit_time = {'day':[],'hour':[], 'minute':[], 'carIn':[]}
         number = self.PersonRegistered(dataFile='course.csv')
         person_uniform = self.PersonIn()
         car_uniform = self.CarInPercent()
         car_num_hour = number * person_uniform * car_uniform
 
-        car_dist_curr = norm.pdf(X, loc=50/unit_time, scale=30/unit_time)
-        car_curr = car_dist_curr * car_num_hour.iloc[hour]
-        car_dist_fmr = norm.pdf(Y, loc=50/unit_time, scale=30/unit_time)
+        for day in car_num_hour.columns:
+            for hour in car_num_hour.index:
+                for i in range(0, 61, unit_time):
+                    X_e = i/unit_time + unit_time/2
+                    X_s = i/unit_time - unit_time/2
+                    car_dist_curr = norm.cdf(X_e, loc=50/unit_time, scale=10/unit_time) - norm.cdf(X_s, loc=50/unit_time, scale=10/unit_time)
+                    car_num_bio = np.random.binomial(car_num_hour[day][hour], car_dist_curr)
 
+                    car_num_unit_time['day'].append(day)
+                    car_num_unit_time['hour'].append(hour)
+                    car_num_unit_time['minute'].append(i)
+                    car_num_unit_time['carIn'].append(car_num_bio)
 
-        car_fmr = car_dist_fmr * car_num_hour.iloc[hour + 1]
-        print (car_num_hour.iloc[hour], car_num_hour.iloc[hour+1])
-        car_num_unit_time = car_curr + car_fmr
+        car_num_unit_time = pd.DataFrame(car_num_unit_time)
+
         return car_num_unit_time
 
 
@@ -90,7 +91,7 @@ class RandomCarInGenerator():
         """
         pass
 
-car = RandomCarInGenerator(9, 50)
+car = RandomCarInGenerator(9, 60)
 print(car.CarInDist())
 
 
