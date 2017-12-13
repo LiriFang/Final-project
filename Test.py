@@ -21,13 +21,34 @@ PARKINGLOTS_TEST = np.array([DANIELSTREET_T, SIXTHSTREET_T])
 
 
 class RandomDurationTimeGenerator():
-    pass
+    def CarStayDuration(self, sampleNumber, low=1, mode=3, high=4):
+        """
+        This function is to produce random numbers according to the 'Modified PERT' distribution.
+        :param sampleNumber: The number of the random sample. This would be defined by our parking system.
+        :param sampleNumber: The number of the random sample. This would be defined by our parking system.
+        :param low: The lowest value expected as possible. 1h is expected here because the shortest class duration is 1h.
+        :param mode: The 'most likely' statistical value. 3h is expected here because the most likely class duration is 3h.
+        :param high: The highest value expected as possible, 4h is expected here because the longest allowed parking is 4h.
+        :param modified_lambda: According to "Modified Pert Simulation" by Paulo Buchsbaum, Modified PERT distribution become PERT when the lambda is 4.
+        :return: a numpy array with random numbers that fit a PERT distribution
+
+        """
+        # Generate the parameters of Beta Distribution according to Paulo Buchsbaum's Formula:
+        mean = (low + modified_lambda * mode + high) / (modified_lambda + 2)
+        ss = (high - 2 * mode + low) / (mean - mode)
+        a = (mean - low) / (high - low) * ss
+        b = (high - mean) / (high - low) * ss
+
+        # Generate the random number with Beta distribution and return the minutes
+        duration_h = np.random.beta(a, b, sampleNumber)
+        duration_m = np.ceil(60 * (duration_h * (high - low) + low))
+        return duration_m
 
 class RandomCarInGenerator():
     def __init__(self, hour:int, minute:int):
         self.hour = hour
         self.minute = minute
-        File = 'course.csv'
+        File = 'Course List.csv'
 
     def PersonRegistered(self, dataFile):
         number = pd.read_csv(dataFile, index_col='hour')
@@ -81,29 +102,7 @@ class RandomCarInGenerator():
         print (car_num_hour.iloc[hour], car_num_hour.iloc[hour+1])
         car_num_unit_time = car_curr + car_fmr
         return car_num_unit_time
-    
-    def CarStayDuration(self, sampleNumber, low=1, mode=3, high=4):
-        """
-        This function is to produce random numbers according to the 'Modified PERT' distribution.
-        :param sampleNumber: The number of the random sample. This would be defined by our parking system.
-        :param sampleNumber: The number of the random sample. This would be defined by our parking system.
-        :param low: The lowest value expected as possible. 1h is expected here because the shortest class duration is 1h.
-        :param mode: The 'most likely' statistical value. 3h is expected here because the most likely class duration is 3h.
-        :param high: The highest value expected as possible, 4h is expected here because the longest allowed parking is 4h.
-        :param modified_lambda: According to "Modified Pert Simulation" by Paulo Buchsbaum, Modified PERT distribution become PERT when the lambda is 4.
-        :return: a numpy array with random numbers that fit a PERT distribution
 
-        """
-        # Generate the parameters of Beta Distribution according to Paulo Buchsbaum's Formula:
-        mean = (low + modified_lambda * mode + high) / (modified_lambda + 2)
-        ss = (high - 2 * mode + low) / (mean - mode)
-        a = (mean - low) / (high - low) * ss
-        b = (high - mean) / (high - low) * ss
-
-        # Generate the random number with Beta distribution and return the minutes
-        duration_h = np.random.beta(a, b, sampleNumber)
-        duration_m = np.ceil(60 * (duration_h * (high - low) + low))
-        return duration_m
 
     def CarInError(self):
         """
