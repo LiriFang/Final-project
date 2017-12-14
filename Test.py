@@ -254,10 +254,10 @@ class iSchoolParkingSimulator():
         self.input_minutes = int(require_time[1])
         # Calculate the times to operate the UNIT simulation process
         simulation_times = int(((self.input_hours - 8) * 60 + self.input_minutes) / UNIT_TIME)
-        print("simulation times:")
-        print(simulation_times)
         # Repeate the simulation 100 times
         for i in range(100):
+            print("*********************************************************")
+            print("This is the " + str(i + 1) + " time simulation the parking process.")
             hour = self.start
             minute = 0
             self.parking_status = PARKINGLOTS_TEST
