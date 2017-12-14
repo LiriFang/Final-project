@@ -51,81 +51,77 @@ class RandomDurationTimeGenerator():
         return car_stay_error
 
 
-# class RandomCarInGenerator():
-#     def __init__(self, hour:int, minute:int):
-#         self.hour = hour
-#         self.minute = minute
-#
-#     def PersonRegistered(self, dataFile):
-#         number = pd.read_csv(dataFile, index_col='hour')
-#         return number
-#
-#     def PersonIn(self):
-#         """
-#         :return: (distribution)number of person attending in the class
-#         """
-#         person_uniform = np.random.uniform(0.5, 0.9)
-#         #person_attended = number * person_uniform
-#         return person_uniform
-#
-#     def CarInPercent(self):
-#         """
-#         :return: percentage of person who drive car and stop the car in the parking area
-#         """
-#         car_uniform = np.random.uniform(0.3, 0.5)
-#         #car_num = car_uniform * person_attended
-#         return car_uniform
-#
-#
-#
-#     def CarInDist(self):
-#         """
-#         :param time: checking time
-#         :return: car in distribution around starting time of class
-#         >>> RandomCarInGenerator.CarInDist(RandomCarInGenerator)
-#         """
-#         minute = self.minute
-#         hour = self.hour
-#
-#         if minute >= 50:
-#             Y = (minute-50)/UNIT_TIME
-#         elif minute < 50:
-#             Y = minute/UNIT_TIME + 10/UNIT_TIME
-#         X = minute/UNIT_TIME
-#          #former
-#
-#         number = self.PersonRegistered(dataFile='Course List.csv')
-#         person_uniform = self.PersonIn()
-#         car_uniform = self.CarInPercent()
-#         car_num_hour = number * person_uniform * car_uniform
-#
-#         car_dist_curr = norm.pdf(X, loc=50/UNIT_TIME, scale=30/UNIT_TIME)
-#         car_curr = car_dist_curr * car_num_hour.iloc[hour]
-#         car_dist_fmr = norm.pdf(Y, loc=50/UNIT_TIME, scale=30/UNIT_TIME)
-#
-#
-#         car_fmr = car_dist_fmr * car_num_hour.iloc[hour + 1]
-#         print (car_num_hour.iloc[hour], car_num_hour.iloc[hour+1])
-#         car_num_unit_time = int(car_curr + car_fmr)
-#         return car_num_unit_time
-#
-#
-#     def CarInError(self):
-#         """
-#         :param time: checking time
-#         :return: Error number of Car (uniform_distribution)
-#         """
-#         car_in_error = np.random.uniform(-2, 2)
-#         car_in_error = int(car_in_error)
-#         if car_in_error < 0:
-#             car_in_error = 0
-#
-#         return car_in_error
-#
+class RandomCarInGenerator():
+    def __init__(self, hour:int, minute:int):
+        self.hour = hour
+        self.minute = minute
 
-# car = RandomCarInGenerator(9, 50)
-# print(car.CarInDist())
+    def PersonRegistered(self, dataFile):
+        number = pd.read_csv(dataFile, index_col='hour')
+        return number
 
+    def PersonIn(self):
+        """
+        :return: (distribution)number of person attending in the class
+        """
+        person_uniform = np.random.uniform(0.5, 0.9)
+        #person_attended = number * person_uniform
+        return person_uniform
+
+    def CarInPercent(self):
+        """
+        :return: percentage of person who drive car and stop the car in the parking area
+        """
+        car_uniform = np.random.uniform(0.3, 0.5)
+        #car_num = car_uniform * person_attended
+        return car_uniform
+
+    def CarInDist(self, unit_time=1):
+        """
+        :param time: checking time
+        :return: car in distribution around starting time of class
+        >>> RandomCarInGenerator.CarInDist(RandomCarInGenerator)
+        """
+        car_num_unit_time = {'day': [], 'hour': [], 'minute': [], 'carIn': []}
+        number = self.PersonRegistered (dataFile='course.csv')
+        person_uniform = self.PersonIn ()
+        car_uniform = self.CarInPercent ()
+        car_num_hour = number * person_uniform * car_uniform
+
+        for day in car_num_hour.columns:
+            for hour in car_num_hour.index:
+                for i in range (0, 61, unit_time):
+                    X_e = i / unit_time + unit_time / 2
+                    X_s = i / unit_time - unit_time / 2
+                    car_dist_curr = norm.cdf (X_e, loc=50 / unit_time, scale=10 / unit_time) - norm.cdf (X_s,
+                                                                                                         loc=50 / unit_time,
+                                                                                                         scale=10 / unit_time)
+                    car_num_bio = np.random.binomial (car_num_hour[day][hour], car_dist_curr)
+
+                    car_num_unit_time['day'].append (day)
+                    car_num_unit_time['hour'].append (hour)
+                    car_num_unit_time['minute'].append (i)
+                    car_num_unit_time['carIn'].append (car_num_bio)
+
+        car_num_unit_time = pd.DataFrame (car_num_unit_time)
+
+        return car_num_unit_time
+
+    def CarInError(self):
+        """
+        :param time: checking time
+        :return: Error number of Car (uniform_distribution)
+        """
+        car_in_error = np.random.uniform(-2, 2)
+        car_in_error = int(car_in_error)
+        if car_in_error < 0:
+            car_in_error = 0
+
+        return car_in_error
+
+
+#print(RandomCarInGenerator(9, 50).CarInDist())
+#print(car.CarInDist())
 
 class ParkingLot():
 
