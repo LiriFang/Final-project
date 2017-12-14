@@ -52,9 +52,10 @@ class RandomDurationTimeGenerator():
 
 
 class RandomCarInGenerator():
-    def __init__(self, hour:int, minute:int):
+    def __init__(self, week: str,  hour:int, minute:int):
         self.hour = hour
         self.minute = minute
+        self.week = week
 
     def PersonRegistered(self, dataFile):
         number = pd.read_csv(dataFile, index_col='hour')
@@ -76,7 +77,7 @@ class RandomCarInGenerator():
         #car_num = car_uniform * person_attended
         return car_uniform
 
-    def CarInDist(self, unit_time=1):
+    def CarInDist(self):
         """
         :param time: checking time
         :return: car in distribution around starting time of class
@@ -90,12 +91,12 @@ class RandomCarInGenerator():
 
         for day in car_num_hour.columns:
             for hour in car_num_hour.index:
-                for i in range (0, 61, unit_time):
-                    X_e = i / unit_time + unit_time / 2
-                    X_s = i / unit_time - unit_time / 2
-                    car_dist_curr = norm.cdf (X_e, loc=50 / unit_time, scale=10 / unit_time) - norm.cdf (X_s,
-                                                                                                         loc=50 / unit_time,
-                                                                                                         scale=10 / unit_time)
+                for i in range (0, 61, UNIT_TIME):
+                    X_e = i / UNIT_TIME + UNIT_TIME / 2
+                    X_s = i / UNIT_TIME - UNIT_TIME / 2
+                    car_dist_curr = norm.cdf (X_e, loc=50 / UNIT_TIME, scale=10 / UNIT_TIME) - norm.cdf (X_s,
+                                                                                                         loc=50 / UNIT_TIME,
+                                                                                                         scale=10 / UNIT_TIME)
                     car_num_bio = np.random.binomial (car_num_hour[day][hour], car_dist_curr)
 
                     car_num_unit_time['day'].append (day)
@@ -107,21 +108,20 @@ class RandomCarInGenerator():
 
         return car_num_unit_time
 
-    def CarInError(self):
+    def CarInError(self, sample_number):
         """
         :param time: checking time
         :return: Error number of Car (uniform_distribution)
         """
-        car_in_error = np.random.uniform(-2, 2)
-        car_in_error = int(car_in_error)
-        if car_in_error < 0:
-            car_in_error = 0
+        car_in_error = (np.random.uniform(-2, 2, size = sample_number)).astype(int)
+        e = car_in_error < 0
+        car_in_error[e] = 0
 
         return car_in_error
 
 
-#print(RandomCarInGenerator(9, 50).CarInDist())
-#print(car.CarInDist())
+# print(RandomCarInGenerator("Monday", 9, 50).CarInDist())
+# print(car.CarInDist())
 
 class ParkingLot():
 
@@ -237,6 +237,7 @@ class iSchoolParkingSimulator():
         # The system will start from 8:00
         self.start = 8
         self.parking_status = 0
+        self.week = ''
 
     def Main(self):
         '''
@@ -244,14 +245,23 @@ class iSchoolParkingSimulator():
         :return:
         >>> iSchoolParkingSimulator.Main(iSchoolParkingSimulator)
         '''
+        require_week = input("Please enter the day you want to check (Monday ~ Friday):")
+        self.week = require_week
         require_time = input("Please enter the time you want to check (e.g.: 8:20):")
         require_time = require_time.split(':')
         self.input_hours = int(require_time[0])
         self.input_minutes = int(require_time[1])
         # Calculate the times to operate the UNIT simulation process
         simulation_times = int(((self.input_hours - 8) * 60 + self.input_minutes) / UNIT_TIME)
-        # Repeate the simulation 100 times
-        for i in range(100):
+
+        # Call random car generator
+        r_c = RandomCarInGenerator(self.week, self.input_hours, self.input_minutes)
+        # The number of car coming into the parking lot at each unit time
+        car_in = r_c.CarInDist()
+        car_error = r_c.CarInError(simulation_times)
+
+        # Repeate the simulation 10 times
+        for i in range(10):
             print("*********************************************************")
             print("This is the " + str(i + 1) + " time simulation the parking process.")
             hour = self.start
@@ -261,7 +271,11 @@ class iSchoolParkingSimulator():
             for j in range(simulation_times):
                 print("----------------------------------------------------")
                 print("hour" + str(hour) + " minute " + str(minute))
-                self.UnitSimulation(self.parking_status, hour, minute)
+                car_in_number = car_in.ix[
+                    (car_in['day'] == self.week) & (car_in['hour'] == hour) & (
+                        car_in['minute'] == minute), 'carIn']
+                car_in_number = car_in_number.get_values()[0]
+                self.UnitSimulation(self.parking_status, self.week, hour, minute, car_in_number, car_error[j])
                 minute = minute + 1
                 if (j + 1) % 60 == 0:
                     minute = 0
@@ -270,7 +284,7 @@ class iSchoolParkingSimulator():
 
 
 
-    def UnitSimulation(self, parking_status: np.array, hour: int, minute: int):
+    def UnitSimulation(self, parking_status: np.array, week: int, hour: int, minute: int, car_in_number: int, car_error_number):
         parking_system = ParkingSystem()
         # Unit time checking
         self.parking_status = parking_system.UnitTimeCheck(parking_status)
@@ -278,43 +292,38 @@ class iSchoolParkingSimulator():
         print("After unit checking:")
         print(self.parking_status)
 
-        # r_c = RandomCarInGenerator(hour, minute)
-        # # The number of car coming into the parking lot at the unit time
-        # car_in_number = r_c.CarInDist()
-        # # The number of error car coming into the parking lot at the unit time
-        # car_error_number = r_c.CarInError()
+
+        # The number of error car coming into the parking lot at the unit time
+        print("car in:")
+        print(car_in_number)
+        print("error car in:")
+        print(car_error_number)
 
         #test:
-        car_error_number = 1
-        car_in_number = 1
-
+        # car_error_number = 1
+        # car_in_number = 1
         r_d = RandomDurationTimeGenerator()
-        # A list of duration for car to stop
-        car_in_duration = r_d.CarStayDuration(car_in_number)
-        print("come in duration:")
-        print(car_in_duration)
-        for duration in car_in_duration:
-            self.parking_status = parking_system.Parking(self.parking_status, duration)
+        if car_in_number != 0:
+            # A list of duration for car to stop
+            car_in_duration = r_d.CarStayDuration(car_in_number)
+            print("come in duration:")
+            print(car_in_duration)
+            for duration in car_in_duration:
+                self.parking_status = parking_system.Parking(self.parking_status, duration)
 
-        print("After adding coming car:")
-        print(self.parking_status)
+            print("After adding coming car:")
+            print(self.parking_status)
 
-        # A list of duration for error to stop
-        car_error_duration = r_d.ErrorStayDuration(car_error_number)
-        print("error duration:")
-        print(car_error_duration)
-        for duration in car_error_duration:
-            self.parking_status = parking_system.Parking(self.parking_status, duration)
+        if car_error_number != 0:
+            # A list of duration for error to stop
+            car_error_duration = r_d.ErrorStayDuration(car_error_number)
+            print("error duration:")
+            print(car_error_duration)
+            for duration in car_error_duration:
+                self.parking_status = parking_system.Parking(self.parking_status, duration)
 
-        print("After adding error car:")
-        print(self.parking_status)
-
-
-
-
-
-
-
+            print("After adding error car:")
+            print(self.parking_status)
 
 
 s = iSchoolParkingSimulator()
