@@ -23,7 +23,7 @@ PARKINGLOTS_TEST = np.array([DANIELSTREET_T, SIXTHSTREET_T])
 
 
 class RandomDurationTimeGenerator():
-    def CarStayDuration(self, sampleNumber, low=1, mode=3, high=4):
+    def CarStayDuration(self, sampleNumber, low=1, mode=3, high=4, modified_lambda=4):
         """
         This function is to produce random numbers according to the 'Modified PERT' distribution.
         :param sampleNumber: The number of the random sample. This would be defined by our parking system.
