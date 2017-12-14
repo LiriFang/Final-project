@@ -6,6 +6,8 @@ from scipy.stats import norm
 
 # unit checking time for the system
 UNIT_TIME = 5
+# Parameter for Pert distribution
+MODIFIED_LAMBDA = 4
 # Each array represents a street. The length of array represents the number of meters on that street, and the item in the array represents the time that the car will stoped.
 DANIELSTREET = np.zeros(23)
 SIXTHSTREET = np.zeros(30)
@@ -29,26 +31,29 @@ class RandomDurationTimeGenerator():
         :param low: The lowest value expected as possible. 1h is expected here because the shortest class duration is 1h.
         :param mode: The 'most likely' statistical value. 3h is expected here because the most likely class duration is 3h.
         :param high: The highest value expected as possible, 4h is expected here because the longest allowed parking is 4h.
-        :param modified_lambda: According to "Modified Pert Simulation" by Paulo Buchsbaum, Modified PERT distribution become PERT when the lambda is 4.
         :return: a numpy array with random numbers that fit a PERT distribution
 
         """
         # Generate the parameters of Beta Distribution according to Paulo Buchsbaum's Formula:
-        mean = (low + modified_lambda * mode + high) / (modified_lambda + 2)
+        mean = (low + MODIFIED_LAMBDA * mode + high) / (MODIFIED_LAMBDA + 2)
         ss = (high - 2 * mode + low) / (mean - mode)
         a = (mean - low) / (high - low) * ss
         b = (high - mean) / (high - low) * ss
 
         # Generate the random number with Beta distribution and return the minutes
         duration_h = np.random.beta(a, b, sampleNumber)
-        duration_m = np.ceil(60 * (duration_h * (high - low) + low))
+        duration_m = int(np.ceil(60 * (duration_h * (high - low) + low)))
         return duration_m
+
+    def ErrorStayDuration(self):
+        car_stay_error = int(np.random.uniform(20, 61))
+        return car_stay_error
+
 
 class RandomCarInGenerator():
     def __init__(self, hour:int, minute:int):
         self.hour = hour
         self.minute = minute
-        File = 'Course List.csv'
 
     def PersonRegistered(self, dataFile):
         number = pd.read_csv(dataFile, index_col='hour')
@@ -72,7 +77,7 @@ class RandomCarInGenerator():
 
 
 
-    def CarInDist(self, unit_time=1):
+    def CarInDist(self):
         """
         :param time: checking time
         :return: car in distribution around starting time of class
@@ -82,10 +87,10 @@ class RandomCarInGenerator():
         hour = self.hour
 
         if minute >= 50:
-            Y = (minute-50)/unit_time
+            Y = (minute-50)/UNIT_TIME
         elif minute < 50:
-            Y = minute/unit_time + 10/unit_time
-        X = minute/unit_time
+            Y = minute/UNIT_TIME + 10/UNIT_TIME
+        X = minute/UNIT_TIME
          #former
 
         number = self.PersonRegistered(dataFile='Course List.csv')
@@ -93,14 +98,14 @@ class RandomCarInGenerator():
         car_uniform = self.CarInPercent()
         car_num_hour = number * person_uniform * car_uniform
 
-        car_dist_curr = norm.pdf(X, loc=50/unit_time, scale=30/unit_time)
+        car_dist_curr = norm.pdf(X, loc=50/UNIT_TIME, scale=30/UNIT_TIME)
         car_curr = car_dist_curr * car_num_hour.iloc[hour]
-        car_dist_fmr = norm.pdf(Y, loc=50/unit_time, scale=30/unit_time)
+        car_dist_fmr = norm.pdf(Y, loc=50/UNIT_TIME, scale=30/UNIT_TIME)
 
 
         car_fmr = car_dist_fmr * car_num_hour.iloc[hour + 1]
         print (car_num_hour.iloc[hour], car_num_hour.iloc[hour+1])
-        car_num_unit_time = car_curr + car_fmr
+        car_num_unit_time = int(car_curr + car_fmr)
         return car_num_unit_time
 
 
@@ -110,7 +115,6 @@ class RandomCarInGenerator():
         :return: Error number of Car (uniform_distribution)
         """
         car_in_error = np.random.uniform(-2, 2)
-        print (car_in_error)
         car_in_error = int(car_in_error)
         if car_in_error < 0:
             car_in_error = 0
@@ -118,8 +122,8 @@ class RandomCarInGenerator():
         return car_in_error
 
 
-# car = RandomCarInGenerator(9, 50)
-# print(car.CarInDist())
+car = RandomCarInGenerator(9, 50)
+print(car.CarInDist())
 
 
 class ParkingLot():
@@ -221,10 +225,6 @@ class ParkingSystem():
         status = self.CheckParkingStatus(self, parking_status)
         empties = status[0]
         occupies = status[1]
-        # user_string = 'Empty parking places on each street:\n'
-        # for i in range(len(empties)):
-        #     user_string = user_string + PARKINGLOTSMAPPING[i] + ': ' + str(empties[i]) + '\n'
-        # return (user_string)
 
         # get number of empty places on each street
         empty_records = pd.DataFrame.from_csv('EmptyRecords.csv', sep = ',', index_col = None)
@@ -237,8 +237,32 @@ class ParkingSystem():
         return(user_string)
 
 
+class iSchoolParkingSimulator():
+
+    def __init__(self):
+        self.input_hours = 0
+        self.input_minutes = 0
+
+    def Main(self):
+        require_time = input("Please enter the time you want to check (e.g.: 8:20):")
+        require_time = require_time.split(':')
+        self.input_hours = int(require_time[0])
+        self.input_minutes = int(require_time[1])
+        # The system will start from 8:00
+        # Calculate the times to operate the UNIT simulation process
+        simulation_times = ((self.input_hours - 8) * 60 + require_time[1]) / UNIT_TIME
+        # Repeate the simulation 100 times
+        for i in range(100):
+            # Simulate the process of parking
+            for j in range(simulation_times):
+                self.UnitSimulation(self, )
+
+    def UnitSimulation(self, current_hour: int):
+        parking_system = ParkingSystem()
+        parking_system.UnitTimeCheck()
 
 
 
-print(ParkingSystem.CalculateParkingProbability(ParkingSystem, PARKINGLOTS_TEST))
-ParkingSystem.UnitTimeCheck(ParkingSystem, PARKINGLOTS_TEST)
+
+
+# s = iSchoolParkingSimulator.Main(iSchoolParkingSimulator)
