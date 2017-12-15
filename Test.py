@@ -9,9 +9,9 @@ UNIT_TIME = 1
 # Parameter for Pert distribution
 MODIFIED_LAMBDA = 4
 # Each array represents a street. The length of array represents the number of meters on that street, and the item in the array represents the time that the car will stoped.
-DANIELSTREET = (np.zeros(13)).astype(int)
-SIXTHSTREET = (np.zeros(20)).astype(int)
-CHALMERSSTREET = (np.zeros(13)).astype(int)
+DANIELSTREET = (np.zeros(6)).astype(int)
+SIXTHSTREET = (np.zeros(10)).astype(int)
+CHALMERSSTREET = (np.zeros(3)).astype(int)
 FIFTHSTREET = (np.zeros(5)).astype(int)
 STREET = (np.zeros(4)).astype(int)
 # whole parking lots around iSchool
